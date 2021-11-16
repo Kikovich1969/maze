@@ -1,6 +1,6 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-let lineWidth = 6; // must be even, otherwise antialiasing will show!
+let lineWidth = 8; // must be even, otherwise antialiasing will show!
 
 let game = {
   width: 600,
@@ -14,23 +14,22 @@ class Maze {
     this.rows = rows;
     this.cells = [];
   }
+  getRandomCell = () => {
+    let randomIndex = generateRandomIntegerInRange(0, this.cells.length - 1);
+    return this.cells[randomIndex];
+  };
+  setNextCell = (activeCell) => {
+    console.log(activeCell.neighbours);
+  };
   drawMaze = () => {
     ctx.strokeStyle = "#ffffff";
     ctx.lineWidth = lineWidth;
-    ctx.lineJoin = 'bevel';
     this.cells.forEach((element) => {
       /* console.log(element.vertices); */
-      //ctx.beginPath();
       ctx.moveTo(element.vertices.tl.x, element.vertices.tl.y);
       ctx.lineTo(element.vertices.tr.x, element.vertices.tr.y);
-      ctx.stroke();
-      //ctx.moveTo(element.vertices.tr.x, element.vertices.tr.y);
       ctx.lineTo(element.vertices.br.x, element.vertices.br.y);
-      ctx.stroke();
-      //ctx.moveTo(element.vertices.br.x, element.vertices.br.y);
       ctx.lineTo(element.vertices.bl.x, element.vertices.bl.y);
-      ctx.stroke();
-      //ctx.moveTo(element.vertices.bl.x, element.vertices.bl.y);
       ctx.lineTo(element.vertices.tl.x, element.vertices.tl.y);
       ctx.stroke();
     });
@@ -52,7 +51,7 @@ class Cell extends Maze {
       bl: { x: undefined, y: undefined } /* Bottom Left */,
       br: { x: undefined, y: undefined } /* Bottom Right */,
     };
-    this.walls = [true, true, true, true];
+    this.walls = { top: true, right: true, bottom: true, left: true };
   }
   setNeighbours = (index) => {
     if (!(this.y === 0)) {
@@ -79,9 +78,8 @@ class Cell extends Maze {
     this.vertices.br.y = this.vertices.tr.y + this.height;
   };
   show = () => {
-    console.log('Show Cell');
-
-  }
+    console.log("Show Cell");
+  };
 }
 
 function init() {
@@ -96,14 +94,13 @@ function init() {
       let index = maze.cells.push(cell) - 1;
       cell.setNeighbours(index);
       cell.setVertices();
-      cell.show();
+      //cell.show();
     }
   }
   maze.drawMaze(canvas);
-  let randomIndex = generateRandomIntegerInRange(0, maze.cells.length - 1);
-  let activeCell = maze.cells[randomIndex];
-  console.log("Active cell:");
-  console.log(activeCell);
+  /* let randomIndex = generateRandomIntegerInRange(0, maze.cells.length - 1);
+  let activeCell = maze.cells[randomIndex]; */
+  let activeCell = maze.getRandomCell();
   activeCell.visited = true;
 
   /* Mark active cell */
