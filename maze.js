@@ -17,14 +17,13 @@ class Maze {
     this.activeCell = undefined;
     this.nextCell = undefined;
     this.createGrid();
-    this.setCellNeighbours();
-    this.setCellVertices();
     this.setActiveCell(this.getRandomCell());
     this.setNextCell(this.activeCell);
     this.drawMaze();
   }
 
   createGrid = () => {
+    let index = 0;
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
         let cell = {
@@ -42,45 +41,41 @@ class Maze {
           },
           walls: { top: true, right: true, bottom: true, left: true },
         };
+
+        /* Set neigghbours */
+        if (!(cell.y === 0)) {
+          cell.neighbours.push({ index: index - this.cols, direction: "top" });
+        }
+        if (!(cell.x === this.cols - 1)) {
+          cell.neighbours.push({ index: index + 1, direction: "right" });
+        }
+        if (!(cell.y === this.rows - 1)) {
+          cell.neighbours.push({
+            index: index + this.cols,
+            direction: "bottom",
+          });
+        }
+        if (!(cell.x === 0)) {
+          cell.neighbours.push({
+            index: index - 1,
+            direction: "left",
+          });
+        }
         this.cells.push(cell);
+
+        /* Set cell verices */
+        cell.vertices.tl.x = cell.x * cell.width;
+        cell.vertices.tl.y = cell.y * cell.height;
+        cell.vertices.tr.x = cell.vertices.tl.x + cell.width;
+        cell.vertices.tr.y = cell.vertices.tl.y;
+        cell.vertices.bl.x = cell.vertices.tl.x;
+        cell.vertices.bl.y = cell.y * cell.height + cell.height;
+        cell.vertices.br.x = cell.vertices.tl.x + cell.width;
+        cell.vertices.br.y = cell.vertices.tr.y + cell.height;
+        index++;
       }
     }
-  };
-
-  setCellNeighbours = () => {
-    this.cells.forEach((cell, index) => {
-      if (!(cell.y === 0)) {
-        cell.neighbours.push({ index: index - this.cols, direction: "top" });
-      }
-      if (!(cell.x === this.cols - 1)) {
-        cell.neighbours.push({ index: index + 1, direction: "right" });
-      }
-      if (!(cell.y === this.rows - 1)) {
-        cell.neighbours.push({
-          index: index + this.cols,
-          direction: "bottom",
-        });
-      }
-      if (!(cell.x === 0)) {
-        cell.neighbours.push({
-          index: index - 1,
-          direction: "left",
-        });
-      }
-    });
-  };
-
-  setCellVertices = () => {
-    this.cells.forEach((cell) => {
-      cell.vertices.tl.x = cell.x * cell.width;
-      cell.vertices.tl.y = cell.y * cell.height;
-      cell.vertices.tr.x = cell.vertices.tl.x + cell.width;
-      cell.vertices.tr.y = cell.vertices.tl.y;
-      cell.vertices.bl.x = cell.vertices.tl.x;
-      cell.vertices.bl.y = cell.y * cell.height + cell.height;
-      cell.vertices.br.x = cell.vertices.tl.x + cell.width;
-      cell.vertices.br.y = cell.vertices.tr.y + cell.height;
-    });
+    console.log(this.cells);
   };
 
   getRandomCell = () => {
@@ -94,7 +89,7 @@ class Maze {
   };
 
   setNextCell = (activeCell) => {
-    console.log(activeCell.neighbours);
+    //console.log(activeCell.neighbours);
     this.nextCell = undefined;
     for (let i = 0; i < activeCell.neighbours.length; i++) {
       if (this.cells[activeCell.neighbours[i].index].visited === false) {
@@ -125,8 +120,8 @@ class Maze {
     if (this.nextCell === undefined) {
       console.log("Backtracking start");
     }
-    console.log(this.nextCell);
-    console.log(this.activeCell);
+    //console.log(this.nextCell);
+    //console.log(this.activeCell);
   };
 
   drawMaze = () => {
@@ -160,8 +155,8 @@ function init() {
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
 
-  let maze = new Maze(5, 4);
-  console.log(maze.cells);
+  let maze = new Maze(10, 7);
+  //console.log(maze.cells);
 }
 
 window.onload = () => {
