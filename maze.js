@@ -1,6 +1,6 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-let lineWidth = 8; // must be even, otherwise antialiasing will show!
+let lineWidth = 2; // must be even, otherwise antialiasing will show!
 
 let game = {
   width: 600,
@@ -17,6 +17,7 @@ class Maze {
     this.activeCell = undefined;
     this.nextCell = undefined;
     this.createGrid();
+    //this.setNeighbourObjects();
     this.setActiveCell(this.getRandomCellIndex());
     this.setNextCell(this.activeCell);
     this.drawMaze();
@@ -61,7 +62,7 @@ class Maze {
             direction: "left",
           });
         }
-        this.cells.push(cell);
+        this.cells.push(cell); 
 
         /* Set cell verices */
         cell.vertices.tl.x = cell.x * cell.width;
@@ -79,6 +80,24 @@ class Maze {
     console.log(this.cells);
   };
 
+  /* setNeighbourObjects = () => {
+    this.cells.forEach((cell, index) => {
+      if (!(cell.y === 0)) {
+        cell.neighbours.push(this.cells[index - this.cols]);
+      }
+      if (!(cell.x === this.cols - 1)) {
+        cell.neighbours.push(this.cells[index + 1]);
+      }
+      if (!(cell.y === this.rows - 1)) {
+        cell.neighbours.push(this.cells[index + this.cols]);
+      }
+      if (!(cell.x === 0)) {
+        cell.neighbours.push(this.cells[index - 1]);
+      }
+    })
+    console.log(this.cells);
+  }; */
+
   getRandomCellIndex = () => {
     let randomIndex = generateRandomIntegerInRange(0, this.cells.length - 1);
     return randomIndex;
@@ -89,24 +108,22 @@ class Maze {
     this.activeCell.visited = true;
   };
 
-  getRandomNeighbour = () => {
-    
-  }
+  getRandomNeighbour = () => {};
 
   setNextCell = (activeCell) => {
     /* Find random neightbour cell which was not visited before */
     let tempNeighbours = activeCell.neighbours;
     let neighboursCount = tempNeighbours.length;
-    let randomNeighboursIndex = tempNeighbours[generateRandomIntegerInRange(0, neighboursCount - 1)].index;
+    let randomNeighboursIndex =
+      tempNeighbours[generateRandomIntegerInRange(0, neighboursCount - 1)]
+        .index;
     //console.log(randomNeighbourIndex);
     let randomNeighbour = this.cells[randomNeighboursIndex];
     if (randomNeighbour.visited) {
-
       //console.log("Must find next neighbour!");
     } else {
-
     }
-    console.log(randomNeighbour);
+    //console.log(randomNeighbour);
     for (let i = 0; i <= activeCell.neighbours.length; i++) {
       if (this.cells[activeCell.neighbours[i].index].visited === false) {
         let direction = activeCell.neighbours[i].direction;
@@ -136,7 +153,7 @@ class Maze {
       }
     }
     if (this.nextCell === undefined) {
-      console.log("Backtracking start");
+      //console.log("Backtracking start");
     }
   };
 
