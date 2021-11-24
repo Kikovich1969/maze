@@ -15,6 +15,7 @@ class Maze {
     this.cells = [];
     this.activeCell = undefined;
     this.nextCell = undefined;
+    this.stack = [];
     this.createCells();
     this.setStartingCell(this.getRandomCellIndex());
     this.setRandomNeighbour();
@@ -93,6 +94,7 @@ class Maze {
   setStartingCell = (index) => {
     this.activeCell = this.cells[index];
     this.activeCell.visited = true;
+    this.stack.push(index);
     //console.log(this.activeCell);
   };
 
@@ -107,7 +109,7 @@ class Maze {
         this.nextCell = this.cells[randomNeighbour.index];
         this.nextCell.visited = true;
         //console.log(this.cells[randomNeighbour]);
-        this.breakWallsBetweenActiveAndRandomNeighbour(direction);
+        this.breakWallsBetweenActiveAndRandomNeighbour(direction, randomNeighbour.index);
       } else {
         /* Chosen neighbour already visited */
         /* Splice already visited neighbour */
@@ -117,11 +119,12 @@ class Maze {
     } else {
       /* No neighbours anymore */
       console.log("No neighbours anymore!");
+
       this.nextCell = false;
     }
   };
 
-  breakWallsBetweenActiveAndRandomNeighbour = (direction) => {
+  breakWallsBetweenActiveAndRandomNeighbour = (direction, index) => {
     console.log("Breaking walls! :)");
     switch (direction) {
       case "top":
@@ -143,6 +146,9 @@ class Maze {
     }
     console.log(this.activeCell);
     this.activeCell = this.nextCell;
+    this.stack.push(index);
+    console.log("Stack:");
+    console.log(this.stack);
     this.setRandomNeighbour();
   };
 
