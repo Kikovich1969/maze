@@ -12,18 +12,17 @@ class Maze {
   constructor(cols, rows) {
     this.cols = cols;
     this.rows = rows;
-    this.cell = {};
     this.cells = [];
     this.activeCell = undefined;
     this.nextCell = undefined;
-    this.createGrid();
-    //this.setNeighbourObjects();
-    this.setActiveCell(this.getRandomCellIndex());
-    this.setNextCell(this.activeCell);
+    this.createCells();
+    this.setStartingCell(this.getRandomCellIndex());
+    this.setRandomNeighbour();
+    //this.setNextCell(this.activeCell);
     this.drawMaze();
   }
 
-  createGrid = () => {
+  createCells = () => {
     let index = 0;
     for (let i = 0; i < this.rows; i++) {
       for (let j = 0; j < this.cols; j++) {
@@ -45,10 +44,16 @@ class Maze {
 
         /* Set neigghbours */
         if (!(cell.y === 0)) {
-          cell.neighbours.push({ index: index - this.cols, direction: "top" });
+          cell.neighbours.push({
+            index: index - this.cols,
+            direction: "top",
+          });
         }
         if (!(cell.x === this.cols - 1)) {
-          cell.neighbours.push({ index: index + 1, direction: "right" });
+          cell.neighbours.push({
+            index: index + 1,
+            direction: "right",
+          });
         }
         if (!(cell.y === this.rows - 1)) {
           cell.neighbours.push({
@@ -62,7 +67,7 @@ class Maze {
             direction: "left",
           });
         }
-        this.cells.push(cell); 
+        this.cells.push(cell);
 
         /* Set cell verices */
         cell.vertices.tl.x = cell.x * cell.width;
@@ -77,42 +82,73 @@ class Maze {
         index++;
       }
     }
-    console.log(this.cells);
+    //console.log(this.cells);
   };
-
-  /* setNeighbourObjects = () => {
-    this.cells.forEach((cell, index) => {
-      if (!(cell.y === 0)) {
-        cell.neighbours.push(this.cells[index - this.cols]);
-      }
-      if (!(cell.x === this.cols - 1)) {
-        cell.neighbours.push(this.cells[index + 1]);
-      }
-      if (!(cell.y === this.rows - 1)) {
-        cell.neighbours.push(this.cells[index + this.cols]);
-      }
-      if (!(cell.x === 0)) {
-        cell.neighbours.push(this.cells[index - 1]);
-      }
-    })
-    console.log(this.cells);
-  }; */
 
   getRandomCellIndex = () => {
     let randomIndex = generateRandomIntegerInRange(0, this.cells.length - 1);
     return randomIndex;
   };
 
-  setActiveCell = (index) => {
+  setStartingCell = (index) => {
     this.activeCell = this.cells[index];
     this.activeCell.visited = true;
+    //console.log(this.activeCell);
   };
 
-  getRandomNeighbour = () => {};
+  setRandomNeighbour = () => {
+    let neighboursCount = this.activeCell.neighbours.length;
+    if (neighboursCount > 0) {
+      let randomIndex = generateRandomIntegerInRange( 0, this.activeCell.neighbours.length - 1 );
+      let randomNeighbour = this.activeCell.neighbours[randomIndex];
+      if (!this.cells[randomNeighbour.index].visited) {
+        /* Chosen neighbour was not visited yet */
+        let direction = randomNeighbour.direction;
+        this.nextCell = this.cells[randomNeighbour.index];
+        this.nextCell.visited = true;
+        //console.log(this.cells[randomNeighbour]);
+        this.breakWallsBetweenActiveAndRandomNeighbour(direction);
+      } else {
+        /* Chosen neighbour already visited */
+        /* Splice already visited neighbour */
+        this.activeCell.neighbours.splice(randomNeighbour);
+        this.setRandomNeighbour();
+      }
+    } else {
+      /* No neighbours anymore */
+      console.log("No neighbours anymore!");
+      this.nextCell = false;
+    }
+  };
 
-  setNextCell = (activeCell) => {
+  breakWallsBetweenActiveAndRandomNeighbour = (direction) => {
+    console.log("Breaking walls! :)");
+    switch (direction) {
+      case "top":
+        this.activeCell.walls.top = false;
+        this.nextCell.walls.bottom = false;
+        break;
+      case "right":
+        this.activeCell.walls.right = false;
+        this.nextCell.walls.left = false;
+        break;
+      case "bottom":
+        this.activeCell.walls.bottom = false;
+        this.nextCell.walls.top = false;
+        break;
+      case "left":
+        this.activeCell.walls.left = false;
+        this.nextCell.walls.right = false;
+        break;
+    }
+    console.log(this.activeCell);
+    this.activeCell = this.nextCell;
+    this.setRandomNeighbour();
+  };
+
+    /* setNextCell = (activeCell) => {
     /* Find random neightbour cell which was not visited before */
-    let tempNeighbours = activeCell.neighbours;
+    /*let tempNeighbours = activeCell.neighbours;
     let neighboursCount = tempNeighbours.length;
     let randomNeighboursIndex =
       tempNeighbours[generateRandomIntegerInRange(0, neighboursCount - 1)]
@@ -123,7 +159,7 @@ class Maze {
       //console.log("Must find next neighbour!");
     } else {
     }
-    //console.log(randomNeighbour);
+    console.log(randomNeighbour);
     for (let i = 0; i <= activeCell.neighbours.length; i++) {
       if (this.cells[activeCell.neighbours[i].index].visited === false) {
         let direction = activeCell.neighbours[i].direction;
@@ -149,13 +185,13 @@ class Maze {
         }
         this.activeCell = this.nextCell;
         break;
-        //this.setNextCell(this.activeCell);
+        this.setNextCell(this.activeCell);
       }
     }
     if (this.nextCell === undefined) {
       //console.log("Backtracking start");
     }
-  };
+  }; */
 
   drawMaze = () => {
     ctx.strokeStyle = "#000000";
