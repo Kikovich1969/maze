@@ -112,7 +112,6 @@ class Maze {
         let direction = randomNeighbour.direction;
         this.nextCell = this.cells[randomNeighbour.index];
         this.nextCell.visited = true;
-        //console.log(this.cells[randomNeighbour]);
         this.breakWallsBetweenActiveAndRandomNeighbour(
           direction,
           randomNeighbour.index
@@ -123,19 +122,18 @@ class Maze {
         this.activeCell.neighbours.splice(randomIndex, 1);
         this.setRandomNeighbour();
       }
-    } else if (this.stack.length > 0) {
-      console.log('Start Backtracking');
+    } else if (this.stack.length > 1) {
       this.stack.pop();
+      this.activeCell = this.cells[this.stack[this.stack.length - 1]];
+      this.setRandomNeighbour();
 
     } else {
       /* No neighbours anymore */
-      console.log("No neighbours anymore!");
       this.nextCell = false;
     }
   };
 
   breakWallsBetweenActiveAndRandomNeighbour = (direction, index) => {
-    console.log("Breaking walls! :)");
     switch (direction) {
       case "top":
         this.activeCell.walls.top = false;
@@ -154,11 +152,8 @@ class Maze {
         this.nextCell.walls.right = false;
         break;
     }
-    console.log(this.activeCell);
     this.activeCell = this.nextCell;
     this.stack.push(index);
-    console.log("Stack:");
-    console.log(this.stack);
     this.setRandomNeighbour();
   };
 
@@ -193,7 +188,6 @@ class Maze {
       }
       ctx.stroke();
       if (wallTop && wallRight && wallBottom && wallLeft) {
-        //console.log("Fill!");
         ctx.rect(
           cell.vertices.tl.x,
           cell.vertices.tl.y,
@@ -211,7 +205,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(6, 4);
+  let maze = new Maze(10, 6);
 }
 
 window.onload = () => {
