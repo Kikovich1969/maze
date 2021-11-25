@@ -1,6 +1,5 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-let lineWidth = 1; // must be even, otherwise antialiasing will show!
 
 let game = {
   width: 600,
@@ -16,6 +15,9 @@ class Maze {
     this.activeCell = undefined;
     this.nextCell = undefined;
     this.stack = [];
+    this.strokeStyle = "#7f7f7f";
+    this.fillStyle = "#7f7f7f";
+    this.lineWidth = 1; // must be even, otherwise antialiasing will show!
     this.createCells();
     this.setStartingCell(this.getRandomCellIndex());
     this.setRandomNeighbour();
@@ -158,8 +160,9 @@ class Maze {
   };
 
   drawMaze = () => {
-    ctx.strokeStyle = "#7f7f7f";
-    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = this.strokeStyle;
+    ctx.fillStyle = this.fillStyle;
+    ctx.lineWidth = this.lineWidth;
     this.cells.forEach((cell) => {
       let wallTop,
         wallRight,
