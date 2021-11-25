@@ -1,6 +1,6 @@
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
-let lineWidth = 2; // must be even, otherwise antialiasing will show!
+let lineWidth = 1; // must be even, otherwise antialiasing will show!
 
 let game = {
   width: 600,
@@ -19,7 +19,6 @@ class Maze {
     this.createCells();
     this.setStartingCell(this.getRandomCellIndex());
     this.setRandomNeighbour();
-    //this.setNextCell(this.activeCell);
     this.drawMaze();
   }
 
@@ -101,7 +100,10 @@ class Maze {
   setRandomNeighbour = () => {
     let neighboursCount = this.activeCell.neighbours.length;
     if (neighboursCount > 0) {
-      let randomIndex = generateRandomIntegerInRange( 0, this.activeCell.neighbours.length - 1 );
+      let randomIndex = generateRandomIntegerInRange(
+        0,
+        this.activeCell.neighbours.length - 1
+      );
       let randomNeighbour = this.activeCell.neighbours[randomIndex];
       if (!this.cells[randomNeighbour.index].visited) {
         /* Chosen neighbour was not visited yet */
@@ -109,11 +111,14 @@ class Maze {
         this.nextCell = this.cells[randomNeighbour.index];
         this.nextCell.visited = true;
         //console.log(this.cells[randomNeighbour]);
-        this.breakWallsBetweenActiveAndRandomNeighbour(direction, randomNeighbour.index);
+        this.breakWallsBetweenActiveAndRandomNeighbour(
+          direction,
+          randomNeighbour.index
+        );
       } else {
         /* Chosen neighbour already visited */
         /* Splice already visited neighbour */
-        this.activeCell.neighbours.splice(randomNeighbour);
+        this.activeCell.neighbours.splice(randomIndex, 1);
         this.setRandomNeighbour();
       }
     } else {
@@ -152,74 +157,41 @@ class Maze {
     this.setRandomNeighbour();
   };
 
-    /* setNextCell = (activeCell) => {
-    /* Find random neightbour cell which was not visited before */
-    /*let tempNeighbours = activeCell.neighbours;
-    let neighboursCount = tempNeighbours.length;
-    let randomNeighboursIndex =
-      tempNeighbours[generateRandomIntegerInRange(0, neighboursCount - 1)]
-        .index;
-    //console.log(randomNeighbourIndex);
-    let randomNeighbour = this.cells[randomNeighboursIndex];
-    if (randomNeighbour.visited) {
-      //console.log("Must find next neighbour!");
-    } else {
-    }
-    console.log(randomNeighbour);
-    for (let i = 0; i <= activeCell.neighbours.length; i++) {
-      if (this.cells[activeCell.neighbours[i].index].visited === false) {
-        let direction = activeCell.neighbours[i].direction;
-        this.nextCell = this.cells[activeCell.neighbours[i].index];
-        this.nextCell.visited = true;
-        switch (direction) {
-          case "top":
-            this.activeCell.walls.top = false;
-            this.nextCell.walls.bottom = false;
-            break;
-          case "right":
-            this.activeCell.walls.right = false;
-            this.nextCell.walls.left = false;
-            break;
-          case "bottom":
-            this.activeCell.walls.bottom = false;
-            this.nextCell.walls.top = false;
-            break;
-          case "left":
-            this.activeCell.walls.left = false;
-            this.nextCell.walls.right = false;
-            break;
-        }
-        this.activeCell = this.nextCell;
-        break;
-        this.setNextCell(this.activeCell);
-      }
-    }
-    if (this.nextCell === undefined) {
-      //console.log("Backtracking start");
-    }
-  }; */
-
   drawMaze = () => {
-    ctx.strokeStyle = "#000000";
+    ctx.strokeStyle = "#7f7f7f";
     ctx.lineWidth = lineWidth;
     this.cells.forEach((cell) => {
+      let wallTop,
+        wallRight,
+        wallBottom,
+        wallLeft = false;
       if (cell.walls.top) {
+        wallTop = true;
         ctx.moveTo(cell.vertices.tl.x, cell.vertices.tl.y);
         ctx.lineTo(cell.vertices.tr.x, cell.vertices.tr.y);
       }
       if (cell.walls.right) {
+        wallRight = true;
         ctx.moveTo(cell.vertices.tr.x, cell.vertices.tr.y);
         ctx.lineTo(cell.vertices.br.x, cell.vertices.br.y);
       }
       if (cell.walls.bottom) {
+        wallBottom = true;
         ctx.moveTo(cell.vertices.br.x, cell.vertices.br.y);
         ctx.lineTo(cell.vertices.bl.x, cell.vertices.bl.y);
       }
       if (cell.walls.left) {
+        wallLeft = true;
         ctx.moveTo(cell.vertices.bl.x, cell.vertices.bl.y);
         ctx.lineTo(cell.vertices.tl.x, cell.vertices.tl.y);
       }
       ctx.stroke();
+      if (wallTop && wallRight && wallBottom && wallLeft) {
+        //console.log("Fill!");
+        ctx.rect(cell.vertices.tl.x, cell.vertices.tl.y, cell.width, cell.height);
+        ctx.fillStyle = "#7f7f7f";
+        ctx.fill();
+      }
     });
   };
 }
@@ -228,7 +200,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(10, 7);
+  let maze = new Maze(6, 4);
 }
 
 window.onload = () => {
