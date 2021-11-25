@@ -1,3 +1,5 @@
+import { generateRandomIntegerInRange } from "./helper.js";
+
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
@@ -84,7 +86,6 @@ class Maze {
         index++;
       }
     }
-    //console.log(this.cells);
   };
 
   getRandomCellIndex = () => {
@@ -96,7 +97,6 @@ class Maze {
     this.activeCell = this.cells[index];
     this.activeCell.visited = true;
     this.stack.push(index);
-    //console.log(this.activeCell);
   };
 
   setRandomNeighbour = () => {
@@ -126,7 +126,6 @@ class Maze {
     } else {
       /* No neighbours anymore */
       console.log("No neighbours anymore!");
-
       this.nextCell = false;
     }
   };
@@ -191,7 +190,12 @@ class Maze {
       ctx.stroke();
       if (wallTop && wallRight && wallBottom && wallLeft) {
         //console.log("Fill!");
-        ctx.rect(cell.vertices.tl.x, cell.vertices.tl.y, cell.width, cell.height);
+        ctx.rect(
+          cell.vertices.tl.x,
+          cell.vertices.tl.y,
+          cell.width,
+          cell.height
+        );
         ctx.fillStyle = "#7f7f7f";
         ctx.fill();
       }
@@ -209,7 +213,3 @@ function init() {
 window.onload = () => {
   init();
 };
-
-function generateRandomIntegerInRange(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
