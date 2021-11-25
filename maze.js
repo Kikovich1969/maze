@@ -123,6 +123,10 @@ class Maze {
         this.activeCell.neighbours.splice(randomIndex, 1);
         this.setRandomNeighbour();
       }
+    } else if (this.stack.length > 0) {
+      console.log('Start Backtracking');
+      this.stack.pop();
+
     } else {
       /* No neighbours anymore */
       console.log("No neighbours anymore!");
