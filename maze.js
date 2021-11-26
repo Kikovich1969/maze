@@ -16,13 +16,19 @@ class Maze {
     this.cells = [];
     this.activeCell = undefined;
     this.nextCell = undefined;
+    this.directionToNextCell = undefined;
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#7f7f7f";
     this.lineWidth = 1; // must be even, otherwise antialiasing will show!
     this.createCells();
-    this.setStartingCell(this.getRandomCellIndex());
-    this.setRandomNeighbour();
+    this.setFirstCell(generateRandomIntegerInRange(0, this.cells.length - 1));
+    this.setNextCell();
+    while(this.nextCell){
+      this.deleteWallsBetweenCells(this.directionToNextCell);
+      this.activeCell = this.nextCell;
+      this.setNextCell();
+    }
     this.drawMaze();
   }
 
@@ -88,18 +94,25 @@ class Maze {
     }
   };
 
-  getRandomCellIndex = () => {
-    let randomIndex = generateRandomIntegerInRange(0, this.cells.length - 1);
-    return randomIndex;
-  };
+  setCellVisited = (index) => {
+    this.cells[index].visited = true;
+  }
 
-  setStartingCell = (index) => {
+  setCellActive = (index) => {
     this.activeCell = this.cells[index];
-    this.activeCell.visited = true;
+  }
+
+  addCellToStack = (index) => {
     this.stack.push(index);
+  }
+
+  setFirstCell = (index) => {
+    this.setCellActive(index);
+    this.setCellVisited(index);
+    this.addCellToStack(index);
   };
 
-  setRandomNeighbour = () => {
+  setNextCell = () => {
     let neighboursCount = this.activeCell.neighbours.length;
     if (neighboursCount > 0) {
       let randomIndex = generateRandomIntegerInRange(
@@ -107,25 +120,23 @@ class Maze {
         this.activeCell.neighbours.length - 1
       );
       let randomNeighbour = this.activeCell.neighbours[randomIndex];
-      if (!this.cells[randomNeighbour.index].visited) {
+      let randomNeighbourIndex = randomNeighbour.index;
+      this.directionToNextCell = randomNeighbour.direction;
+      if (!this.cells[randomNeighbourIndex].visited) {
         /* Chosen neighbour was not visited yet */
-        let direction = randomNeighbour.direction;
-        this.nextCell = this.cells[randomNeighbour.index];
-        this.nextCell.visited = true;
-        this.breakWallsBetweenActiveAndRandomNeighbour(
-          direction,
-          randomNeighbour.index
-        );
+        this.setCellVisited(randomNeighbourIndex);
+        this.addCellToStack(randomNeighbourIndex);
+        this.nextCell = this.cells[randomNeighbourIndex];
       } else {
         /* Chosen neighbour already visited */
         /* Splice already visited neighbour */
         this.activeCell.neighbours.splice(randomIndex, 1);
-        this.setRandomNeighbour();
+        this.setNextCell();
       }
     } else if (this.stack.length > 1) {
       this.stack.pop();
-      this.activeCell = this.cells[this.stack[this.stack.length - 1]];
-      this.setRandomNeighbour();
+      this.setCellActive(this.stack[this.stack.length - 1]);
+      this.setNextCell();
 
     } else {
       /* No neighbours anymore */
@@ -133,7 +144,7 @@ class Maze {
     }
   };
 
-  breakWallsBetweenActiveAndRandomNeighbour = (direction, index) => {
+  deleteWallsBetweenCells = (direction, index) => {
     switch (direction) {
       case "top":
         this.activeCell.walls.top = false;
@@ -152,9 +163,6 @@ class Maze {
         this.nextCell.walls.right = false;
         break;
     }
-    this.activeCell = this.nextCell;
-    this.stack.push(index);
-    this.setRandomNeighbour();
   };
 
   drawMaze = () => {
@@ -187,6 +195,7 @@ class Maze {
         ctx.lineTo(cell.vertices.tl.x, cell.vertices.tl.y);
       }
       ctx.stroke();
+      /* If  */
       if (wallTop && wallRight && wallBottom && wallLeft) {
         ctx.rect(
           cell.vertices.tl.x,
@@ -205,7 +214,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(10, 6);
+  let maze = new Maze(7, 5);
 }
 
 window.onload = () => {
