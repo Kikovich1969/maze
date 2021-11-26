@@ -24,11 +24,13 @@ class Maze {
     this.createCells();
     this.setFirstCell(generateRandomIntegerInRange(0, this.cells.length - 1));
     this.setNextCell();
-    while(this.nextCell){
+    while (this.nextCell) {
       this.deleteWallsBetweenCells(this.directionToNextCell);
       this.activeCell = this.nextCell;
       this.setNextCell();
     }
+    this.setComplexity(0);
+    //this.closeQuads();
     this.drawMaze();
   }
 
@@ -92,19 +94,20 @@ class Maze {
         index++;
       }
     }
+    //console.log(this.cells);
   };
 
   setCellVisited = (index) => {
     this.cells[index].visited = true;
-  }
+  };
 
   setCellActive = (index) => {
     this.activeCell = this.cells[index];
-  }
+  };
 
   addCellToStack = (index) => {
     this.stack.push(index);
-  }
+  };
 
   setFirstCell = (index) => {
     this.setCellActive(index);
@@ -137,14 +140,13 @@ class Maze {
       this.stack.pop();
       this.setCellActive(this.stack[this.stack.length - 1]);
       this.setNextCell();
-
     } else {
       /* No neighbours anymore */
       this.nextCell = false;
     }
   };
 
-  deleteWallsBetweenCells = (direction, index) => {
+  deleteWallsBetweenCells = (direction) => {
     switch (direction) {
       case "top":
         this.activeCell.walls.top = false;
@@ -163,6 +165,37 @@ class Maze {
         this.nextCell.walls.right = false;
         break;
     }
+  };
+
+  setComplexity = (complexity) => {
+    switch(complexity){
+      case 0:
+        break;
+      case 1:
+        this.closeQuads();
+        break;
+      default:
+        break;
+    }
+  };
+
+  closeQuads = () => {
+    this.cells.forEach((cell) => {
+      //console.log(Object.entries(cell.walls));
+      let closedWalls = 0;
+      for (let direction in cell.walls) {
+        if (cell.walls[direction]) {
+          closedWalls++;
+        }
+      }
+      if (closedWalls === 3) {
+        //console.log("Wall can be closed");
+        cell.walls.top = true;
+        cell.walls.right = true;
+        cell.walls.bottom = true;
+        cell.walls.left = true;
+      }
+    });
   };
 
   drawMaze = () => {
@@ -203,7 +236,7 @@ class Maze {
           cell.width,
           cell.height
         );
-        ctx.fillStyle = "#7f7f7f";
+        ctx.fillStyle = this.fillStyle;
         ctx.fill();
       }
     });
@@ -214,7 +247,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(7, 5);
+  let maze = new Maze(6, 4);
 }
 
 window.onload = () => {
