@@ -4,8 +4,8 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
 let game = {
-  width: 600,
-  height: 400,
+  width: 800,
+  height: 600,
   backgroundColor: "white",
 };
 
@@ -20,7 +20,8 @@ class Maze {
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#7f7f7f";
-    this.lineWidth = 1; // must be even, otherwise antialiasing will show!
+    this.lineWidth = 5; // must be even, otherwise antialiasing will show!
+    this.complexity = generateRandomIntegerInRange(0, 3);
     this.createCells();
     this.setFirstCell(generateRandomIntegerInRange(0, this.cells.length - 1));
     this.setNextCell();
@@ -29,7 +30,7 @@ class Maze {
       this.activeCell = this.nextCell;
       this.setNextCell();
     }
-    this.setComplexity(2);
+    this.setComplexity(this.complexity);
     //this.closeQuads();
     this.drawMaze();
   }
@@ -216,7 +217,7 @@ class Maze {
         for (let direction in cell.walls) {
           if (cell.walls[direction] === true) {
             cell.walls[direction] = false;
-            break;
+            //break;
           }
         }
       }
@@ -272,7 +273,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(8, 6);
+  let maze = new Maze(7, 5);
 }
 
 window.onload = () => {
