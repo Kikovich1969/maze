@@ -29,7 +29,7 @@ class Maze {
       this.activeCell = this.nextCell;
       this.setNextCell();
     }
-    this.setComplexity(3);
+    this.setComplexity(2);
     //this.closeQuads();
     this.drawMaze();
   }
@@ -272,7 +272,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(5, 3);
+  let maze = new Maze(8, 6);
 }
 
 window.onload = () => {
