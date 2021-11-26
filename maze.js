@@ -31,7 +31,6 @@ class Maze {
       this.setNextCell();
     }
     this.setComplexity(this.complexity);
-    //this.closeQuads();
     this.drawMaze();
   }
 
@@ -187,6 +186,8 @@ class Maze {
     }
   };
 
+  /* Method for closing cells, which have three walls left */
+  /* These cells are then filled with a fillColor */
   closeQuads = () => {
     this.cells.forEach((cell) => {
       let closedWalls = 0;
@@ -213,11 +214,46 @@ class Maze {
           closedWalls++;
         }
       }
-      if (closedWalls !== 4 && cell.y !== 0 && cell.x !== 0 && cell.y !== (this.rows -1) && cell.x !== (this.cols - 1)) {
-        for (let direction in cell.walls) {
-          if (cell.walls[direction] === true) {
-            cell.walls[direction] = false;
-            //break;
+      /* Walls in slosed quads and cells at the gaome border are not deleted */
+      if (
+        closedWalls !== 4 &&
+        cell.y !== 0 &&
+        cell.x !== 0 &&
+        cell.y !== this.rows - 1 &&
+        cell.x !== this.cols - 1
+      ) {
+        if (closedWalls === 3) {
+          console.log('3 closed walls');
+          /* Delete 2 walls - one left */
+          let i = 0;
+          for (let direction in cell.walls) {
+            if(i == 2) break;
+            if (cell.walls[direction] === true) {
+              cell.walls[direction] = false;
+              i++;
+            }
+          }
+        }
+        else if (closedWalls === 2) {
+          console.log('2 closed walls');
+          /* Delete 1 wall - one left */
+          let i = 0;
+          for (let direction in cell.walls) {
+            if(i == 1) break;
+            if (cell.walls[direction] === true) {
+              cell.walls[direction] = false;
+              i++;
+            }
+          }
+        }
+        else {
+          console.log('1 closed walls');
+          /* Delete 1 wall - one left */
+          for (let direction in cell.walls) {
+            if (cell.walls[direction] === true) {
+              cell.walls[direction] = false;
+              break;
+            }
           }
         }
       }
