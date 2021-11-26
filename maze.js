@@ -29,7 +29,7 @@ class Maze {
       this.activeCell = this.nextCell;
       this.setNextCell();
     }
-    this.setComplexity(0);
+    this.setComplexity(3);
     //this.closeQuads();
     this.drawMaze();
   }
@@ -168,11 +168,18 @@ class Maze {
   };
 
   setComplexity = (complexity) => {
-    switch(complexity){
+    switch (complexity) {
       case 0:
         break;
       case 1:
         this.closeQuads();
+        break;
+      case 2:
+        this.deleteRandomWalls();
+        break;
+      case 3:
+        this.closeQuads();
+        this.deleteRandomWalls();
         break;
       default:
         break;
@@ -181,7 +188,6 @@ class Maze {
 
   closeQuads = () => {
     this.cells.forEach((cell) => {
-      //console.log(Object.entries(cell.walls));
       let closedWalls = 0;
       for (let direction in cell.walls) {
         if (cell.walls[direction]) {
@@ -194,6 +200,25 @@ class Maze {
         cell.walls.right = true;
         cell.walls.bottom = true;
         cell.walls.left = true;
+      }
+    });
+  };
+
+  deleteRandomWalls = () => {
+    this.cells.forEach((cell) => {
+      let closedWalls = 0;
+      for (let direction in cell.walls) {
+        if (cell.walls[direction]) {
+          closedWalls++;
+        }
+      }
+      if (closedWalls !== 4 && cell.y !== 0 && cell.x !== 0 && cell.y !== (this.rows -1) && cell.x !== (this.cols - 1)) {
+        for (let direction in cell.walls) {
+          if (cell.walls[direction] === true) {
+            cell.walls[direction] = false;
+            break;
+          }
+        }
       }
     });
   };
@@ -247,7 +272,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(6, 4);
+  let maze = new Maze(5, 3);
 }
 
 window.onload = () => {
