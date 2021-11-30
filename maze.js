@@ -4,8 +4,8 @@ let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
 let game = {
-  width: 800,
-  height: 600,
+  width: 600,
+  height: 400,
   backgroundColor: "white",
 };
 
@@ -214,7 +214,7 @@ class Maze {
           closedWalls++;
         }
       }
-      /* Walls in slosed quads and cells at the gaome border are not deleted */
+      /* Walls in closed quads and cells at the gaome border are not deleted */
       if (
         closedWalls !== 4 &&
         cell.y !== 0 &&
@@ -259,6 +259,10 @@ class Maze {
       }
     });
   };
+
+  deleteRandomCells = () => {
+
+  }
 
   drawMaze = () => {
     ctx.strokeStyle = this.strokeStyle;
@@ -306,10 +310,12 @@ class Maze {
 }
 
 function init() {
+  canvas.setAttribute('width', game.width);
+  canvas.setAttribute('height', game.height);
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(7, 5);
+  let maze = new Maze(6, 4);
 }
 
 window.onload = () => {
