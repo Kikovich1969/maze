@@ -1,4 +1,5 @@
 import { generateRandomIntegerInRange } from "./helper.js";
+import { pickRandom } from "./helper.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
@@ -30,7 +31,9 @@ class Maze {
       this.activeCell = this.nextCell;
       this.setNextCell();
     }
+    this.deleteRandomCells(5);
     this.setComplexity(this.complexity);
+    console.log(this.cells);
     this.drawMaze();
   }
 
@@ -260,8 +263,9 @@ class Maze {
     });
   };
 
-  deleteRandomCells = () => {
-
+  deleteRandomCells = (count) => {
+    let cellsToDelete = pickRandom(this.cells, count);
+    console.log(cellsToDelete);
   }
 
   drawMaze = () => {
@@ -315,7 +319,7 @@ function init() {
   canvas.style.width = game.width;
   canvas.style.height = game.height;
   canvas.style.backgroundColor = game.backgroundColor;
-  let maze = new Maze(6, 4);
+  let maze = new Maze(8, 6);
 }
 
 window.onload = () => {
