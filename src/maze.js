@@ -30,7 +30,7 @@ class Maze {
       this.currentCell = this.nextCell;
       this.setNextCell();
     }
-    this.deleteRandomCells(5);
+    this.deleteRandomCells(10);
     this.setComplexity(this.complexity);
     this.drawMaze();
   }
@@ -97,14 +97,6 @@ class Maze {
     }
   };
 
-  setCellVisited = (index) => {
-    this.cells[index].visited = true;
-  };
-
-  addCellToStack = (index) => {
-    this.stack.push(index);
-  };
-
   setCurrentCell = (index) => {
     this.currentCell = this.cells[index];
     this.currentCell.visited = true;
@@ -133,12 +125,11 @@ class Maze {
         this.currentCell = this.cells[(this.stack[this.stack.length - 1])];
         this.setNextCell();
       } else {
-        console.log("Reached last cell!");
+        //console.log("Reached last cell!");
         this.nextCell = false;
-        console.log(this.cells);
+        //console.log(this.cells);
       }
     }
-
   };
 
   deleteWallsBetweenCells = (direction) => {
@@ -255,7 +246,7 @@ class Maze {
 
   deleteRandomCells = (count) => {
     let cellsToDelete = pickRandom(this.cells, count);
-    //console.log(cellsToDelete);
+    console.log(cellsToDelete);
   };
 
   drawMaze = () => {
