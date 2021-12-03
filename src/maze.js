@@ -21,7 +21,7 @@ class Maze {
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#7f7f7f";
     this.lineWidth = 5; // must be even, otherwise antialiasing will show!
-    this.complexity = generateRandomIntegerInRange(0, 3);
+    this.wallSize = 4; // must be even, otherwise antialiasing will show!
     this.createCells();
     this.setCurrentCell(generateRandomIntegerInRange(0, this.cells.length - 1));
     this.setNextCell();
@@ -30,9 +30,10 @@ class Maze {
       this.currentCell = this.nextCell;
       this.setNextCell();
     }
-    this.deleteRandomCells(10);
-    this.setComplexity(this.complexity);
-    this.drawMaze();
+    this.closeQuads();
+    this.deleteRandomCells(generateRandomIntegerInRange(0, 20));
+    //this.drawMaze();
+    this.fillMaze();
   }
 
   createCells = () => {
@@ -97,6 +98,9 @@ class Maze {
     }
   };
 
+  /**
+   * @param {number} index Index of cell in array, which is the current cell
+   */
   setCurrentCell = (index) => {
     this.currentCell = this.cells[index];
     this.currentCell.visited = true;
@@ -107,7 +111,7 @@ class Maze {
     /* New version */
     this.currentCell.neighbours = _.shuffle(this.currentCell.neighbours);
     let foundNextCell = false;
-    for (let i = 0; i <= (this.currentCell.neighbours.length - 1); i++) {
+    for (let i = 0; i <= this.currentCell.neighbours.length - 1; i++) {
       let neighbourIndex = this.currentCell.neighbours[i].index;
       this.directionToNextCell = this.currentCell.neighbours[i].direction;
       if (this.cells[neighbourIndex].visited === false) {
@@ -122,16 +126,17 @@ class Maze {
     if (foundNextCell === false) {
       if (this.stack.length > 1) {
         this.stack.pop();
-        this.currentCell = this.cells[(this.stack[this.stack.length - 1])];
+        this.currentCell = this.cells[this.stack[this.stack.length - 1]];
         this.setNextCell();
       } else {
-        //console.log("Reached last cell!");
         this.nextCell = false;
-        //console.log(this.cells);
       }
     }
   };
 
+  /**
+   * @param {string} direction In which direction the walls should be deleted; top | right | bottom | left
+   */
   deleteWallsBetweenCells = (direction) => {
     switch (direction) {
       case "top":
@@ -149,25 +154,6 @@ class Maze {
       case "left":
         this.currentCell.walls.left = false;
         this.nextCell.walls.right = false;
-        break;
-    }
-  };
-
-  setComplexity = (complexity) => {
-    switch (complexity) {
-      case 0:
-        break;
-      case 1:
-        this.closeQuads();
-        break;
-      case 2:
-        this.deleteRandomWalls();
-        break;
-      case 3:
-        this.closeQuads();
-        this.deleteRandomWalls();
-        break;
-      default:
         break;
     }
   };
@@ -192,61 +178,146 @@ class Maze {
     });
   };
 
-  deleteRandomWalls = () => {
-    this.cells.forEach((cell) => {
-      let closedWalls = 0;
-      for (let direction in cell.walls) {
-        if (cell.walls[direction]) {
-          closedWalls++;
+  /**
+   * @param {number} count How many cells should be deleted
+   */
+  deleteRandomCells = (count) => {
+    //let cellsToDelete = pickRandom(this.cells, count);
+    //console.log(cellsToDelete);
+    pickRandom(this.cells, count).forEach((cell) => {
+      let cellIndex = this.getCellIndex(cell.x, cell.y);
+
+      /* Is it a border cell? */
+      if (!(cell.y === 0)) {
+        cell.walls.top = false;
+        /* Is ther any neighbour? */
+        if (this.getCellIndexOfNeighbour(cellIndex, "top")) {
+          this.cells[
+            this.getCellIndexOfNeighbour(cellIndex, "top")
+          ].walls.bottom = false;
         }
       }
-      /* Walls in closed quads and cells at the gaome border are not deleted */
-      if (
-        closedWalls !== 4 &&
-        cell.y !== 0 &&
-        cell.x !== 0 &&
-        cell.y !== this.rows - 1 &&
-        cell.x !== this.cols - 1
-      ) {
-        if (closedWalls === 3) {
-          console.log("3 closed walls");
-          /* Delete 2 walls - one left */
-          let i = 0;
-          for (let direction in cell.walls) {
-            if (i == 2) break;
-            if (cell.walls[direction] === true) {
-              cell.walls[direction] = false;
-              i++;
-            }
-          }
-        } else if (closedWalls === 2) {
-          console.log("2 closed walls");
-          /* Delete 1 wall - one left */
-          let i = 0;
-          for (let direction in cell.walls) {
-            if (i == 1) break;
-            if (cell.walls[direction] === true) {
-              cell.walls[direction] = false;
-              i++;
-            }
-          }
-        } else {
-          console.log("1 closed walls");
-          /* Delete 1 wall - one left */
-          for (let direction in cell.walls) {
-            if (cell.walls[direction] === true) {
-              cell.walls[direction] = false;
-              break;
-            }
-          }
+
+      if (!(cell.x >= this.cols - 1)) {
+        cell.walls.right = false;
+        /* Is ther any neighbour? */
+        if (this.getCellIndexOfNeighbour(cellIndex, "right")) {
+          this.cells[
+            this.getCellIndexOfNeighbour(cellIndex, "right")
+          ].walls.left = false;
+        }
+      }
+
+      if (!(cell.y >= this.rows - 1)) {
+        cell.walls.bottom = false;
+        /* Is ther any neighbour? */
+        if (this.getCellIndexOfNeighbour(cellIndex, "bottom")) {
+          this.cells[
+            this.getCellIndexOfNeighbour(cellIndex, "bottom")
+          ].walls.top = false;
+        }
+      }
+
+      if (!(cell.x <= 0)) {
+        cell.walls.left = false;
+        /* Is ther any neighbour? */
+        if (this.getCellIndexOfNeighbour(cellIndex, "left")) {
+          this.cells[
+            this.getCellIndexOfNeighbour(cellIndex, "left")
+          ].walls.right = false;
         }
       }
     });
   };
 
-  deleteRandomCells = (count) => {
-    let cellsToDelete = pickRandom(this.cells, count);
-    console.log(cellsToDelete);
+  /**
+   * @param {number} x x coord of cell
+   * @param {number} y y coord of cell
+   */
+  getCellIndex = (x, y) => {
+    return _.findIndex(this.cells, { x, y });
+  };
+
+  /**
+   * @param {number} index Index of cell in array
+   * @param {string} direction Direction to neighbour cell
+   */
+  getCellIndexOfNeighbour = (index, direction) => {
+    switch (direction) {
+      case "top":
+        return !(this.cells[index].y === 0) ? index - this.cols : false;
+      case "right":
+        return !(this.cells[index].x === this.cols - 1) ? index + 1 : false;
+      case "bottom":
+        return !(this.cells[index].y === this.rows - 1)
+          ? index + this.cols
+          : false;
+      case "left":
+        return !(this.cells[index].x === 0) ? index - 1 : false;
+      default:
+        return false;
+    }
+  };
+
+  fillMaze = () => {
+    ctx.fillStyle = this.fillStyle;
+    this.cells.forEach((cell) => {
+      console.log(cell);
+      let wallTop = false;
+      let wallRight = false;
+      let wallBottom = false;
+      let wallLeft = false;
+
+      if (cell.walls.top) {
+        wallTop = true;
+        ctx.fillRect(
+          cell.vertices.tl.x,
+          cell.vertices.tl.y,
+          cell.width,
+          this.wallSize
+        );
+      }
+      if (cell.walls.right) {
+        wallRight = true;
+        ctx.fillRect(
+          cell.vertices.tr.x - this.wallSize,
+          cell.vertices.tr.y,
+          this.wallSize,
+          cell.height
+        );
+      }
+      if (cell.walls.bottom) {
+        wallBottom = true;
+        ctx.fillRect(
+          cell.vertices.br.x,
+          cell.vertices.br.y,
+          -cell.width,
+          -this.wallSize
+        );
+      }
+      if (cell.walls.left) {
+        wallLeft = true;
+        ctx.fillRect(
+          cell.vertices.bl.x,
+          cell.vertices.bl.y,
+          this.wallSize,
+          -cell.height
+        );
+      }
+      if (wallTop && wallRight && wallBottom && wallLeft) {
+        console.log("Four walls present!");
+        ctx.fillRect(
+          cell.vertices.tl.x,
+          cell.vertices.tl.y,
+          cell.width,
+          cell.height
+        );
+      }
+      /* console.log(wallTop);
+      console.log(wallRight);
+      console.log(wallBottom);
+      console.log(wallLeft); */
+    });
   };
 
   drawMaze = () => {
