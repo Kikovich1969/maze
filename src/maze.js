@@ -6,7 +6,7 @@ let ctx = canvas.getContext("2d");
 let game = {
   width: 600,
   height: 400,
-  backgroundColor: "white",
+  backgroundColor: "#dedede",
 };
 
 class Maze {
@@ -20,7 +20,7 @@ class Maze {
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#7f7f7f";
-    this.lineWidth = 5; // must be even, otherwise antialiasing will show!
+    this.lineWidth = 1; // must be even, otherwise antialiasing will show!
     this.wallSize = 4; // must be even, otherwise antialiasing will show!
     this.createCells();
     this.setCurrentCell(generateRandomIntegerInRange(0, this.cells.length - 1));
@@ -32,8 +32,8 @@ class Maze {
     }
     this.closeQuads();
     this.deleteRandomCells(generateRandomIntegerInRange(0, 20));
-    //this.drawMaze();
-    this.fillMaze();
+    this.strokeMaze();
+    //this.fillMaze();
   }
 
   createCells = () => {
@@ -320,7 +320,7 @@ class Maze {
     });
   };
 
-  drawMaze = () => {
+  strokeMaze = () => {
     ctx.strokeStyle = this.strokeStyle;
     ctx.fillStyle = this.fillStyle;
     ctx.lineWidth = this.lineWidth;
