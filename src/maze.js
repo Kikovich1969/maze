@@ -20,8 +20,8 @@ class Maze {
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#7f7f7f";
-    this.lineWidth = 1; // must be even, otherwise antialiasing will show!
-    this.wallSize = 4; // must be even, otherwise antialiasing will show!
+    this.lineWidth = 4; // must be even, otherwise antialiasing will show!
+    this.wallSize = 6; // must be even, otherwise antialiasing will show!
     this.createCells();
     this.setCurrentCell(generateRandomIntegerInRange(0, this.cells.length - 1));
     this.setNextCell();
@@ -261,8 +261,9 @@ class Maze {
 
   fillMaze = () => {
     ctx.fillStyle = this.fillStyle;
+    let t = [];
     this.cells.forEach((cell) => {
-      console.log(cell);
+      //console.log(cell);
       let wallTop = false;
       let wallRight = false;
       let wallBottom = false;
@@ -270,53 +271,28 @@ class Maze {
 
       if (cell.walls.top) {
         wallTop = true;
-        ctx.fillRect(
-          cell.vertices.tl.x,
-          cell.vertices.tl.y,
-          cell.width,
-          this.wallSize
-        );
+        t.push({x: cell.vertices.tl.x, y: cell.vertices.tl.y, w: cell.width, h: this.wallSize});
       }
       if (cell.walls.right) {
         wallRight = true;
-        ctx.fillRect(
-          cell.vertices.tr.x - this.wallSize,
-          cell.vertices.tr.y,
-          this.wallSize,
-          cell.height
-        );
+        t.push({x: cell.vertices.tr.x - this.wallSize, y: cell.vertices.tr.y, w: this.wallSize, h: cell.height});
       }
       if (cell.walls.bottom) {
         wallBottom = true;
-        ctx.fillRect(
-          cell.vertices.br.x,
-          cell.vertices.br.y,
-          -cell.width,
-          -this.wallSize
-        );
+        t.push({x: cell.vertices.br.x, y: cell.vertices.br.y, w: -cell.width, h: -this.wallSize});
       }
       if (cell.walls.left) {
         wallLeft = true;
-        ctx.fillRect(
-          cell.vertices.bl.x,
-          cell.vertices.bl.y,
-          this.wallSize,
-          -cell.height
-        );
+        t.push({x: cell.vertices.bl.x, y: cell.vertices.bl.y, w: this.wallSize, h: -cell.height});
       }
       if (wallTop && wallRight && wallBottom && wallLeft) {
         console.log("Four walls present!");
-        ctx.fillRect(
-          cell.vertices.tl.x,
-          cell.vertices.tl.y,
-          cell.width,
-          cell.height
-        );
+        t = []; //empty array
+        t.push({x: cell.vertices.tl.x, y: cell.vertices.tl.y, w: cell.width, h: cell.height});
       }
-      /* console.log(wallTop);
-      console.log(wallRight);
-      console.log(wallBottom);
-      console.log(wallLeft); */
+      t.forEach(wallSegment => {
+        ctx.fillRect( wallSegment.x, wallSegment.y, wallSegment.w, wallSegment.h);
+      });
     });
   };
 
