@@ -10,7 +10,7 @@ let ctx = canvas.getContext("2d");
 let game = {
   config: {
     width: 800,
-    height: 400,
+    height: 500,
     backgroundColor: "#dedede",
     //scene: [bootGame, playGame]
   },
@@ -311,11 +311,17 @@ class Maze {
       }
     });
   };
+
+  redrawMaze = () => {
+    /* Clear canvas */
+    ctx.clearRect(0, 0, game.config.width, game.config.height);
+    this.strokeMaze();
+  }
 }
 
 function init() {
   window.focus();
-  resizeGame(game);
+  //resizeGame(game);
   canvas.setAttribute("width", game.config.width);
   canvas.setAttribute("height", game.config.height);
   canvas.style.width = game.config.width;
@@ -326,5 +332,5 @@ function init() {
 
 window.onload = () => {
   init();
-  window.addEventListener("resize", resizeGame(game));
+  //window.addEventListener("resize", resizeGame(game));
 };
