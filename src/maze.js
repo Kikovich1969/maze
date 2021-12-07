@@ -9,8 +9,9 @@ let ctx = canvas.getContext("2d");
 
 let game = {
   config: {
-    width: 800,
-    height: 500,
+    /* 19:9 */
+    width: 1080,
+    height: 512,
     backgroundColor: "#dedede",
     //scene: [bootGame, playGame]
   },
@@ -43,7 +44,9 @@ class Maze {
     this.strokeMaze();
   }
 
-  setCellSize = () => {};
+  setCellSize = () => {
+    
+  };
 
   createCells = () => {
     let index = 0;
