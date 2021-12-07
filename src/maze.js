@@ -1,13 +1,22 @@
-import { generateRandomIntegerInRange, pickRandom } from "./../tools/helper.js";
+import { generateRandomIntegerInRange, pickRandom, resizeGame } from "./../tools/helper.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
 
 let game = {
+  config: {
+    width: 640,
+    height: 480,
+    backgroundColor: "#dedede",
+    //scene: [bootGame, playGame]
+  }
+};
+
+/* let game = {
   width: 600,
   height: 400,
   backgroundColor: "#dedede",
-};
+}; */
 
 class Maze {
   constructor(cols, rows) {
@@ -19,8 +28,9 @@ class Maze {
     this.directionToNextCell = undefined;
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
-    this.fillStyle = "#7f7f7f";
+    this.fillStyle = "#424242";
     this.lineWidth = 4; // must be even, otherwise antialiasing will show!
+    this.lineCap = 'square'; //'butt', 'round', 'square'
     this.wallSize = 6; // must be even, otherwise antialiasing will show!
     this.createCells();
     this.setCurrentCell(generateRandomIntegerInRange(0, this.cells.length - 1));
@@ -33,7 +43,10 @@ class Maze {
     this.closeQuads();
     this.deleteRandomCells(generateRandomIntegerInRange(0, 20));
     this.strokeMaze();
-    //this.fillMaze();
+  }
+
+  setCellSize =() => {
+    
   }
 
   createCells = () => {
@@ -259,52 +272,17 @@ class Maze {
     }
   };
 
-  fillMaze = () => {
+  strokeMaze = () => {
+    ctx.strokeStyle = this.strokeStyle;
     ctx.fillStyle = this.fillStyle;
-    let t = [];
+    ctx.lineWidth = this.lineWidth;
+    ctx.lineCap = this.lineCap;
     this.cells.forEach((cell) => {
-      //console.log(cell);
       let wallTop = false;
       let wallRight = false;
       let wallBottom = false;
       let wallLeft = false;
 
-      if (cell.walls.top) {
-        wallTop = true;
-        t.push({x: cell.vertices.tl.x, y: cell.vertices.tl.y, w: cell.width, h: this.wallSize});
-      }
-      if (cell.walls.right) {
-        wallRight = true;
-        t.push({x: cell.vertices.tr.x - this.wallSize, y: cell.vertices.tr.y, w: this.wallSize, h: cell.height});
-      }
-      if (cell.walls.bottom) {
-        wallBottom = true;
-        t.push({x: cell.vertices.br.x, y: cell.vertices.br.y, w: -cell.width, h: -this.wallSize});
-      }
-      if (cell.walls.left) {
-        wallLeft = true;
-        t.push({x: cell.vertices.bl.x, y: cell.vertices.bl.y, w: this.wallSize, h: -cell.height});
-      }
-      if (wallTop && wallRight && wallBottom && wallLeft) {
-        console.log("Four walls present!");
-        t = []; //empty array
-        t.push({x: cell.vertices.tl.x, y: cell.vertices.tl.y, w: cell.width, h: cell.height});
-      }
-      t.forEach(wallSegment => {
-        ctx.fillRect( wallSegment.x, wallSegment.y, wallSegment.w, wallSegment.h);
-      });
-    });
-  };
-
-  strokeMaze = () => {
-    ctx.strokeStyle = this.strokeStyle;
-    ctx.fillStyle = this.fillStyle;
-    ctx.lineWidth = this.lineWidth;
-    this.cells.forEach((cell) => {
-      let wallTop,
-        wallRight,
-        wallBottom,
-        wallLeft = false;
       if (cell.walls.top) {
         wallTop = true;
         ctx.moveTo(cell.vertices.tl.x, cell.vertices.tl.y);
@@ -333,7 +311,6 @@ class Maze {
           cell.width,
           cell.height
         );
-        ctx.fillStyle = this.fillStyle;
         ctx.fill();
       }
     });
@@ -341,11 +318,14 @@ class Maze {
 }
 
 function init() {
-  canvas.setAttribute("width", game.width);
-  canvas.setAttribute("height", game.height);
-  canvas.style.width = game.width;
-  canvas.style.height = game.height;
-  canvas.style.backgroundColor = game.backgroundColor;
+  window.focus();
+  resizeGame(game);
+  window.addEventListener("resize", resizeGame);
+  /* canvas.setAttribute("width", game.config.width);
+  canvas.setAttribute("height", game.config.height);
+  canvas.style.width = game.config.width;
+  canvas.style.height = game.config.height;
+  canvas.style.backgroundColor = game.config.backgroundColor; */
   let maze = new Maze(8, 6);
 }
 
