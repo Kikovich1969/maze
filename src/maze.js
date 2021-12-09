@@ -24,11 +24,12 @@ class Maze {
     this.cells = [];
     this.currentCell = undefined;
     this.nextCell = undefined;
+    this.cellCount = undefined;
     this.directionToNextCell = undefined;
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#424242";
-    this.lineWidth = 4; // must be even, otherwise antialiasing will show!
+    this.lineWidth = 10;
     this.lineCap = "square"; //'butt', 'round', 'square'
     this.setCellSize();
     this.createCells();
@@ -40,7 +41,7 @@ class Maze {
       this.setNextCell();
     }
     this.closeQuads();
-    this.deleteRandomCells(generateRandomIntegerInRange(0, 20));
+    this.deleteRandomCells(generateRandomIntegerInRange(0, this.cellCount - 1));
     this.strokeMaze();
   }
 
@@ -110,6 +111,7 @@ class Maze {
         index++;
       }
     }
+    this.cellCount = this.cells.length;
   };
 
   /**
@@ -337,7 +339,7 @@ function init() {
   canvas.style.width = game.config.width;
   canvas.style.height = game.config.height;
   canvas.style.backgroundColor = game.config.backgroundColor;
-  maze = new Maze(7);
+  maze = new Maze(12);
 }
 
 window.onload = () => {
