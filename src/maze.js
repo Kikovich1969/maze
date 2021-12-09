@@ -1,16 +1,16 @@
 import {
   generateRandomIntegerInRange,
   pickRandom,
-  resizeGame,
 } from "./../tools/helper.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
+let maze = undefined;
 
 let game = {
   config: {
-    width: 800,
-    height: 500,
+    width: undefined,
+    height: undefined,
     backgroundColor: "#dedede",
     //scene: [bootGame, playGame]
   },
@@ -20,6 +20,7 @@ class Maze {
   constructor(cols, rows) {
     this.cols = cols;
     this.rows = rows;
+    this.cellSize = undefined;
     this.cells = [];
     this.currentCell = undefined;
     this.nextCell = undefined;
@@ -29,7 +30,7 @@ class Maze {
     this.fillStyle = "#424242";
     this.lineWidth = 4; // must be even, otherwise antialiasing will show!
     this.lineCap = "square"; //'butt', 'round', 'square'
-    this.wallSize = 6; // must be even, otherwise antialiasing will show!
+    this.setCellSize();
     this.createCells();
     this.setCurrentCell(generateRandomIntegerInRange(0, this.cells.length - 1));
     this.setNextCell();
@@ -43,7 +44,11 @@ class Maze {
     this.strokeMaze();
   }
 
-  setCellSize = () => {};
+  setCellSize = () => {
+    let size = Math.floor(game.config.width / this.cols);
+    this.rows = Math.floor(game.config.height / size);
+    this.cellSize = size;
+  };
 
   createCells = () => {
     let index = 0;
@@ -52,8 +57,8 @@ class Maze {
         let cell = {
           x: j,
           y: i,
-          width: Math.floor(game.config.width / this.cols),
-          height: Math.floor(game.config.height / this.rows),
+          width: this.cellSize,
+          height: this.cellSize,
           visited: false,
           neighbours: [],
           vertices: {
@@ -319,18 +324,22 @@ class Maze {
   }
 }
 
+function setGameSize () {
+  game.config.width = window.innerWidth;
+  game.config.height = window.innerHeight;
+}
+
 function init() {
   window.focus();
-  //resizeGame(game);
+  setGameSize();
   canvas.setAttribute("width", game.config.width);
   canvas.setAttribute("height", game.config.height);
   canvas.style.width = game.config.width;
   canvas.style.height = game.config.height;
   canvas.style.backgroundColor = game.config.backgroundColor;
-  let maze = new Maze(8, 6);
+  maze = new Maze(7);
 }
 
 window.onload = () => {
   init();
-  //window.addEventListener("resize", resizeGame(game));
 };
