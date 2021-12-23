@@ -1,7 +1,4 @@
-import {
-  generateRandomIntegerInRange,
-  pickRandom,
-} from "./../tools/helper.js";
+import { generateRandomIntegerInRange, pickRandom } from "./../tools/helper.js";
 
 let canvas = document.getElementById("canvas");
 let ctx = canvas.getContext("2d");
@@ -29,7 +26,7 @@ class Maze {
     this.stack = [];
     this.strokeStyle = "#7f7f7f";
     this.fillStyle = "#424242";
-    this.lineWidth = 10;
+    this.lineWidth = 6;
     this.lineCap = "square"; //'butt', 'round', 'square'
     this.setCellSize();
     this.createCells();
@@ -41,7 +38,8 @@ class Maze {
       this.setNextCell();
     }
     this.closeQuads();
-    this.deleteRandomCells(generateRandomIntegerInRange(0, this.cellCount - 1));
+    //this.deleteRandomCells(generateRandomIntegerInRange(0, this.cellCount - 1));
+    this.deleteRandomCells(generateRandomIntegerInRange(0, this.cellCount - 10));
     this.strokeMaze();
   }
 
@@ -109,6 +107,7 @@ class Maze {
         cell.vertices.br.y = cell.vertices.tr.y + cell.height;
 
         index++;
+        console.log(cell);
       }
     }
     this.cellCount = this.cells.length;
@@ -178,6 +177,12 @@ class Maze {
   /* These cells are then filled with a fillColor */
   closeQuads = () => {
     this.cells.forEach((cell) => {
+      console.log(
+        _.countBy(cell.walls, (wall) => {
+          //return wall.direction ? true : false;
+          //return wall.direction;
+        })
+      );
       let closedWalls = 0;
       for (let direction in cell.walls) {
         if (cell.walls[direction]) {
@@ -208,9 +213,7 @@ class Maze {
         cell.walls.top = false;
         /* Is ther any neighbour? */
         if (this.getCellIndexOfNeighbour(cellIndex, "top")) {
-          this.cells[
-            this.getCellIndexOfNeighbour(cellIndex, "top")
-          ].walls.bottom = false;
+          this.cells[this.getCellIndexOfNeighbour(cellIndex, "top")].walls.bottom = false;
         }
       }
 
@@ -218,9 +221,7 @@ class Maze {
         cell.walls.right = false;
         /* Is ther any neighbour? */
         if (this.getCellIndexOfNeighbour(cellIndex, "right")) {
-          this.cells[
-            this.getCellIndexOfNeighbour(cellIndex, "right")
-          ].walls.left = false;
+          this.cells[this.getCellIndexOfNeighbour(cellIndex, "right")].walls.left = false;
         }
       }
 
@@ -228,9 +229,7 @@ class Maze {
         cell.walls.bottom = false;
         /* Is ther any neighbour? */
         if (this.getCellIndexOfNeighbour(cellIndex, "bottom")) {
-          this.cells[
-            this.getCellIndexOfNeighbour(cellIndex, "bottom")
-          ].walls.top = false;
+          this.cells[this.getCellIndexOfNeighbour(cellIndex, "bottom")].walls.top = false;
         }
       }
 
@@ -238,9 +237,7 @@ class Maze {
         cell.walls.left = false;
         /* Is ther any neighbour? */
         if (this.getCellIndexOfNeighbour(cellIndex, "left")) {
-          this.cells[
-            this.getCellIndexOfNeighbour(cellIndex, "left")
-          ].walls.right = false;
+          this.cells[this.getCellIndexOfNeighbour(cellIndex, "left")].walls.right = false;
         }
       }
     });
@@ -265,9 +262,7 @@ class Maze {
       case "right":
         return !(this.cells[index].x === this.cols - 1) ? index + 1 : false;
       case "bottom":
-        return !(this.cells[index].y === this.rows - 1)
-          ? index + this.cols
-          : false;
+        return !(this.cells[index].y === this.rows - 1) ? index + this.cols : false;
       case "left":
         return !(this.cells[index].x === 0) ? index - 1 : false;
       default:
@@ -308,12 +303,7 @@ class Maze {
       }
       ctx.stroke();
       if (wallTop && wallRight && wallBottom && wallLeft) {
-        ctx.rect(
-          cell.vertices.tl.x,
-          cell.vertices.tl.y,
-          cell.width,
-          cell.height
-        );
+        ctx.rect(cell.vertices.tl.x, cell.vertices.tl.y, cell.width, cell.height);
         ctx.fill();
       }
     });
@@ -323,12 +313,14 @@ class Maze {
     /* Clear canvas */
     ctx.clearRect(0, 0, game.config.width, game.config.height);
     this.strokeMaze();
-  }
+  };
 }
 
-function setGameSize () {
-  game.config.width = window.innerWidth;
-  game.config.height = window.innerHeight;
+function setGameSize() {
+  //game.config.width = window.innerWidth;
+  //game.config.height = window.innerHeight;
+  game.config.width = 800;
+  game.config.height = 600;
 }
 
 function init() {
@@ -339,7 +331,7 @@ function init() {
   canvas.style.width = game.config.width;
   canvas.style.height = game.config.height;
   canvas.style.backgroundColor = game.config.backgroundColor;
-  maze = new Maze(12);
+  maze = new Maze(10);
 }
 
 window.onload = () => {
